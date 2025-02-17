@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.print.DocFlavor.STRING;
 
 import main.Board;
 import main.GamePanel;
@@ -16,6 +17,7 @@ public class Piece {
 	public int col, row, preCol, preRow;
 	public int color;
 	public Piece hittingP;
+	public boolean moved;
 	
 	public Piece(int color, int col, int row) {
 		
@@ -74,6 +76,7 @@ public class Piece {
 		y = getY(row);
 		preCol = getCol(x);
 		preRow = getRow(y);
+		moved = true;
 	}
 	
 	public void resetPosition() {

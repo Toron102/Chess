@@ -3,8 +3,10 @@ package main;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -30,6 +32,7 @@ public class GamePanel extends JPanel implements Runnable{
 	public static ArrayList<Piece> pieces = new ArrayList<>();
 	public static ArrayList<Piece> simPieces = new ArrayList<>();
 	Piece activeP;
+	public static Piece castlingP;
 	
 	//Color
 	public static final int WHITE = 0;
@@ -39,6 +42,7 @@ public class GamePanel extends JPanel implements Runnable{
 	//Booleans
 	boolean canMove;
 	boolean validSquare;
+	
 	
 	public GamePanel() {
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -67,11 +71,11 @@ public class GamePanel extends JPanel implements Runnable{
 		pieces.add(new Pawn(WHITE, 6, 6));
 		pieces.add(new Pawn(WHITE, 7, 6));
 		pieces.add(new Rook(WHITE, 0, 7));
-		pieces.add(new Rook(WHITE, 7, 5));
+		pieces.add(new Rook(WHITE, 7, 7));
 		pieces.add(new Knight(WHITE, 1, 7));
 		pieces.add(new Knight(WHITE, 6, 7));
-		pieces.add(new Bishop(WHITE, 2, 7));
-		pieces.add(new Bishop(WHITE, 5, 7));
+		pieces.add(new Bishop(WHITE, 2, 5));
+		pieces.add(new Bishop(WHITE, 5, 5));
 		pieces.add(new Queen(WHITE, 3, 5));
 		pieces.add(new King(WHITE, 4, 7));
 		
@@ -88,9 +92,9 @@ public class GamePanel extends JPanel implements Runnable{
 		pieces.add(new Rook(BLACK, 7, 0));
 		pieces.add(new Knight(BLACK, 1, 0));
 		pieces.add(new Knight(BLACK, 6, 0));
-		pieces.add(new Bishop(BLACK, 2, 0));
-		pieces.add(new Bishop(BLACK, 5, 0));
-		pieces.add(new Queen(BLACK, 3, 0));
+		pieces.add(new Bishop(BLACK, 2, 3));
+		pieces.add(new Bishop(BLACK, 5, 3));
+		pieces.add(new Queen(BLACK, 3, 3));
 		pieces.add(new King(BLACK, 4, 0));
 		
 	}
@@ -160,6 +164,12 @@ public class GamePanel extends JPanel implements Runnable{
 					//Update piece list in case a piece has been captured and removed during simulation
 					copyPieces(simPieces, pieces);
 					activeP.updatePosition();
+					
+					if(castlingP != null) {
+						castlingP.updatePosition();
+					}
+					
+					changePlayer();
 				}
 				else {
 					
@@ -181,6 +191,13 @@ public class GamePanel extends JPanel implements Runnable{
 		//This is for restoring the removed piece during simulation
 		copyPieces(pieces, simPieces);
 		
+		//Reset castling piece's positions
+		if(castlingP != null) {
+			castlingP.col = castlingP.preCol;
+			castlingP.x = castlingP.getX(castlingP.preCol);
+			castlingP = null;
+		}
+		
 		//If a piece is being held, update it's position
 		activeP.x = mouse.x - Board.HALF_SQUARE_SIZE;
 		activeP.y = mouse.y - Board.HALF_SQUARE_SIZE;
@@ -197,8 +214,34 @@ public class GamePanel extends JPanel implements Runnable{
 				simPieces.remove(activeP.hittingP.getIndex());
 			}
 			
+			checkCastling();
+			
 			validSquare = true;
 		}
+	}
+	
+	private void checkCastling(){
+		
+		if(castlingP != null) {
+			if(castlingP.col == 0) {
+				castlingP.col += 3;
+			}
+			else if(castlingP.col == 7) {
+				castlingP.col -= 2;
+			}
+			castlingP.x = castlingP.getX(castlingP.col);
+		}
+	}
+	
+	private void changePlayer() {
+		
+		if(currentColor == WHITE) {
+			currentColor = BLACK;
+		}
+		else {
+			currentColor = WHITE;
+		}
+		activeP = null;
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -225,6 +268,18 @@ public class GamePanel extends JPanel implements Runnable{
 			}
 
 			activeP.draw(g2);
+		}
+		
+		//Status messages
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2.setFont(new Font("Book Antiqua", Font.PLAIN, 40));
+		g2.setColor(Color.white);
+		
+		if(currentColor == WHITE) {
+			g2.drawString("White's turn", 840, 550);
+		}
+		else {
+			g2.drawString("Black's turn", 840, 250);
 		}
 	}
 }
