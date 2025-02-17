@@ -74,6 +74,13 @@ public class Piece {
 	
 	public void updatePosition() {
 		
+		//To check En Passant
+		if(type == Type.PAWN) {
+			if(Math.abs(row - preRow) == 2) {
+				twoStepped = true;
+			}
+		}
+		
 		x = getX(col);
 		y = getY(row);
 		preCol = getCol(x);
