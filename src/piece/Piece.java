@@ -9,15 +9,17 @@ import javax.print.DocFlavor.STRING;
 
 import main.Board;
 import main.GamePanel;
+import main.Type;
 
 public class Piece {
 
+	public Type type;
 	public BufferedImage image;
 	public int x, y;
 	public int col, row, preCol, preRow;
 	public int color;
 	public Piece hittingP;
-	public boolean moved;
+	public boolean moved, twoStepped;
 	
 	public Piece(int color, int col, int row) {
 		

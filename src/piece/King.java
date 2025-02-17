@@ -1,6 +1,7 @@
 package piece;
 
 import main.GamePanel;
+import main.Type;
 
 public class King extends Piece{
 
@@ -8,6 +9,7 @@ public class King extends Piece{
 	public King(int color, int col, int row) {
 		super(color, col, row);
 		
+		type = Type.KING;
 		
 		if(color == GamePanel.WHITE) {
 			image = getImage("/piece/w-king");
@@ -38,7 +40,7 @@ public class King extends Piece{
 					Piece pR[] = new Piece[2];
 					for(Piece piece : GamePanel.simPieces) {
 						//Check if there is knight
-						if(piece.col == preCol+2 && piece.row == preRow) {
+						if(piece.col == preCol+2 && piece.row == preRow && piece.type != Type.KING) {
 							pR[0] = piece;
 						}
 						if(piece.col == preCol+3 && piece.row == preRow){
