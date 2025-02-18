@@ -52,8 +52,8 @@ public class GamePanel extends JPanel implements Runnable{
 		addMouseMotionListener(mouse);
 		addMouseListener(mouse);
 		
-//		setPieces();
-		test();
+		setPieces();
+//		test();
 		copyPieces(pieces, simPieces);
 	}
 	
@@ -239,7 +239,9 @@ public class GamePanel extends JPanel implements Runnable{
 			
 			checkCastling();
 			
-			validSquare = true;
+			if(isIllegal(activeP) == false) {
+				validSquare = true;
+			}
 		}
 	}
 	
@@ -318,6 +320,18 @@ public class GamePanel extends JPanel implements Runnable{
 		}
 	}
 	
+	private boolean isIllegal(Piece king) {
+		
+		if(king.type == Type.KING) {
+			for(Piece piece : simPieces) {
+				if(piece != king && piece.color != king.color && piece.canMove(king.col, king.row)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	public void paintComponent(Graphics g) {
 		
 		super.paintComponent(g);
@@ -332,15 +346,26 @@ public class GamePanel extends JPanel implements Runnable{
 			p.draw(g2);
 		}
 		
+		//Draw white square, so the player will know he is hovering over correct squares
 		if(activeP != null) {
 			if(canMove) {
-				g2.setColor(Color.white);
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
-				g2.fillRect(activeP.col*Board.SQUARE_SIZE, activeP.row*Board.SQUARE_SIZE,
-						Board.SQUARE_SIZE, Board.SQUARE_SIZE);
-				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+				if(isIllegal(activeP)) {
+					g2.setColor(Color.red);
+					g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
+					g2.fillRect(activeP.col*Board.SQUARE_SIZE, activeP.row*Board.SQUARE_SIZE,
+							Board.SQUARE_SIZE, Board.SQUARE_SIZE);
+					g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+				}
+				else {
+					g2.setColor(Color.white);
+					g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
+					g2.fillRect(activeP.col*Board.SQUARE_SIZE, activeP.row*Board.SQUARE_SIZE,
+							Board.SQUARE_SIZE, Board.SQUARE_SIZE);
+					g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+				}
 			}
-
+			
+			//We draw piece at the end, so it will be always visible
 			activeP.draw(g2);
 		}
 		
